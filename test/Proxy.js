@@ -45,18 +45,21 @@ describe("Proxy", function () {
     it("Should works with upgrades", async function () {
       const { proxy, proxyAsLogic1, proxyAsLogic2, logic1, logic2} = await loadFixture(deployFixture);
 
+      //START AT LOGIC 1
+
       await proxy.changeImplementation(logic1.getAddress());
       assert.equal(await lookUpUint(proxy.getAddress(),"0x0"), 0);
 
       await proxyAsLogic1.changeX(45);
       assert.equal(await lookUpUint(proxy.getAddress(),"0x0"), 45);
 
+      //UPGARADE TO LOGIC 2
+
       await proxy.changeImplementation(logic2.getAddress());
       assert.equal(await lookUpUint(proxy.getAddress(),"0x0"), 45);
 
-      await proxyAsLogic2.changeX(25);
       await proxyAsLogic2.tripleX();
-      assert.equal(await lookUpUint(proxy.getAddress(),"0x0"), 75);
+      assert.equal(await lookUpUint(proxy.getAddress(),"0x0"), 135);
 
       
     }); 
