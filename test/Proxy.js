@@ -24,14 +24,21 @@ describe("Proxy", function () {
     return { proxy, proxyAsLogic1, proxyAsLogic2, logic1, logic2 };
   }
   
+  //eth_getStorage
+  //we bypassing public getter by looking directly into storage slot
+  
+  async function lookUpUint(contractAddr, slot) {
+    return parseInt(await ethers.provider.getStorage(contractAddr, slot));
+  }
+
     it("Should works with logic1", async function () {
       const { proxy, proxyAsLogic1, logic1, } = await loadFixture(deployFixture);
 
       await proxy.changeImplementation(logic1.getAddress());
-      assert.equal(await logic1.x(), 0);
+      assert.equal(await lookUpUint(logic1.getAddress(),"0x0"), 0);
 
       await proxyAsLogic1.changeX(52);
-      assert.equal(await logic1.x(), 52);
+      assert.equal(await lookUpUint(logic1.getAddress(),"0x0"), 52);
       
     });
 
@@ -39,17 +46,17 @@ describe("Proxy", function () {
       const { proxy, proxyAsLogic1, proxyAsLogic2, logic1, logic2} = await loadFixture(deployFixture);
 
       await proxy.changeImplementation(logic1.getAddress());
-      assert.equal(await logic1.x(), 0);
+      assert.equal(await lookUpUint(logic1.getAddress(),"0x0"), 0);
 
       await proxyAsLogic1.changeX(45);
-      assert.equal(await logic1.x(), 45);
+      assert.equal(await lookUpUint(logic1.getAddress(),"0x0"), 45);
 
       await proxy.changeImplementation(logic2.getAddress());
-      assert.equal(await logic2.x(), 0);
+      assert.equal(await lookUpUint(logic2.getAddress(),"0x0"), 0);
 
       await proxyAsLogic2.changeX(25);
       await proxyAsLogic2.tripleX();
-      assert.equal(await logic2.x(), 75);
+      assert.equal(await lookUpUint(logic2.getAddress(),"0x0"), 75);
 
       
     }); 
