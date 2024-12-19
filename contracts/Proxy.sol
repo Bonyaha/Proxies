@@ -7,6 +7,7 @@ pragma solidity ^0.8.28;
 //EOA -> Proxy-> Logic1
 //            -> Logic2
 contract Proxy {
+    uint x = 0;
     address implementation;
 
     function changeImplementation(address _implementation) external {
@@ -14,7 +15,7 @@ contract Proxy {
     }
 
     fallback() external {
-        (bool success, ) = implementation.call(msg.data);
+        (bool success, ) = implementation.delegatecall(msg.data);
         require(success);
     }    
      
